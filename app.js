@@ -9,7 +9,7 @@ server.listen(3000);
 app.get('/',function(req,res){
     res.sendfile(__dirname + "/index.html");
 });
-
+app.use("/css", express.static(__dirname + '/css'));
 io.sockets.on('connection', function(socket){
     socket.on('typing',function(data,callback){
         if(socket.nickname in userTyping){

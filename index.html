@@ -65,6 +65,7 @@
                 <div id="chat"></div>
             </div>
             <div id="users"></div>
+            <span id="dummy"></span>
         </div>
         
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
@@ -86,14 +87,18 @@
                 
                 $nickForm.submit(function(e){
                     e.preventDefault();
-                    socket.emit('new user', $nickBox.val(), function(data){
-                        if(data){
-                            $('#nickWrap').hide("slide", { direction: "left" }, 1000);
-                            $('#contentWrap').fadeIn('2000');
-                        }else{
-                            $nickError.html('username already taken');
-                        }
-                    });
+                     if ((/[^a-z0-9\.]/gi).test($nickBox.val())) {
+                        $nickError.html('Invalid characters');
+                    }else{
+                        socket.emit('new user', $nickBox.val(), function(data){
+                            if(data){
+                                $('#nickWrap').hide("slide", { direction: "left" }, 1000);
+                                $('#contentWrap').fadeIn('2000');
+                            }else{
+                                $nickError.html('username already taken');
+                            }
+                        });
+                    }
 //                    $nickBox.val('');
                 })
                 $messageBox.on('keyup',function(){
@@ -131,9 +136,13 @@
                 $messageForm.submit(function(e){
                     e.preventDefault();
                     if($messageBox.val()!=""){
-                        socket.emit('send message',$messageBox.val(),function(data){
-                            $chat.prepend("<span class='error'><b>"+ data + "</span><br>").effect('highlight');   
-                         });
+                        if($messageBox.val() == "/clear"){
+                            $chat.html('');  
+                        }else{
+                            socket.emit('send message',$messageBox.val(),function(data){
+                                $chat.prepend("<span class='error'><b>"+ data + "</span><br>").effect('highlight');   
+                             });
+                        }
                         $messageBox.val('').focus();
                     }
                 });
@@ -143,13 +152,14 @@
                     if(data.nick == $nickBox.val()){
                         name = "You"
                     }
-                    $chat.prepend("<small style='display: none;' class='msg'><b>"+ name +"</b>: "+data.msg+ "</small><hr>");;
+                    $chat.prepend("<small style='display: none;' class='msg'><b>"+ name +"</b><pre> "+data.msg+ "</pre></small><hr>");;
                     $chat.find('.msg:first').show("slide", { direction: "left" }, 500);
                     $msg.text('');
+                    playSound();
                 })
                 
                 socket.on('whisper',function(data){
-                    $chat.prepend("<span style='display: none;' class='whisper'><b>"+ data.nick+"</b>: "+data.msg+ "</span><br>").effect('highlight');
+                    $chat.prepend("<span style='display: none;' class='whisper'><b>"+ data.nick+"</b><pre> "+data.msg+ "</pre></span><br>").effect('highlight');
                     $chat.find('.whisper:first').show("slide", { direction: "left" }, 500);
                 })
                 $("#toggleusers").on('click',function(){
@@ -161,6 +171,12 @@
                 })
                 
             });
+        </script>
+        <script language="javascript" type="text/javascript">
+        function playSound() {
+          document.getElementById("dummy").innerHTML=
+            "<embed src='css/audio/button-6.mp3' hidden=\"true\" autostart=\"true\" loop=\"false\" />";
+        }
         </script>
 </body>
 </html>
