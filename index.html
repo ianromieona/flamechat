@@ -22,9 +22,12 @@
         #users {
            overflow-x: auto;
            max-height: 500px;
-           max-width: 300px;
-           border-right: 1px dotted #353535;
+           max-width: 160px;
            display: none;
+        }
+        .user {
+           border: 1px solid #353535;
+
         }
         .error{
             color:red;
@@ -99,10 +102,8 @@
                             }
                         });
                     }
-//                    $nickBox.val('');
                 })
                 $messageBox.on('keyup',function(){
-//                     console.log($(this).val())
                      if($(this).val()!=""){
                          socket.emit('typing', $nickBox.val(), function(data){})
                      }else{
@@ -129,7 +130,7 @@
                 socket.on('usernames', function(data){
                     var html = '';
                     for(i=0; i<data.length;i++){
-                        html += '<b>'+data[i] + '</b><hr/>' ; 
+                        html += '<div class="user"> '+data[i] + '</div>' ; 
                     }
                     $users.html(html);
                 })
@@ -152,14 +153,14 @@
                     if(data.nick == $nickBox.val()){
                         name = "You"
                     }
-                    $chat.prepend("<small style='display: none;' class='msg'><b>"+ name +"</b><pre> "+data.msg+ "</pre></small><hr>");;
+                    $chat.prepend("<small style='display: none;' class='msg'><b>"+ name +"</b> :"+data.msg+ "</small><hr>");;
                     $chat.find('.msg:first').show("slide", { direction: "left" }, 500);
                     $msg.text('');
                     playSound();
                 })
                 
                 socket.on('whisper',function(data){
-                    $chat.prepend("<span style='display: none;' class='whisper'><b>"+ data.nick+"</b><pre> "+data.msg+ "</pre></span><br>").effect('highlight');
+                    $chat.prepend("<span style='display: none;' class='whisper'><b>"+ data.nick+"</b> :"+data.msg+ "</pre><hr>").effect('highlight');
                     $chat.find('.whisper:first').show("slide", { direction: "left" }, 500);
                 })
                 $("#toggleusers").on('click',function(){
