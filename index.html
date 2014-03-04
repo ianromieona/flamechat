@@ -70,7 +70,7 @@
             <div id="users"></div>
             <span id="dummy"></span>
         </div>
-        
+        <script src="https://cdn.firebase.com/v0/firebase.js"></script>
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
         <script src="/socket.io/socket.io.js"></script>
@@ -87,7 +87,29 @@
                 var $chat = $('#chat');
                 var $msg = $('#msg');
                 var $typing = $('#typing');
-                
+                var url = 'https://flamechat.firebaseio-demo.com/message_list/.json';
+                var tmpname,tmpmessage; 
+                $.ajax({
+                  dataType: "json",
+                  url: url,
+                  success: function(data){
+                        if(data){
+                            $.each(data,function(key,value){
+                              $.each(value,function(field,value){
+                                  if(field == 'name'){
+                                      tmpname = value;
+                                  }
+                                  if(field == 'message'){
+                                      tmpmessage = value;
+                                  }                              
+                                  console.log(field+" "+value)
+                              })
+                                  $chat.prepend("<small class='msg'><b>"+ tmpname +"</b> :"+tmpmessage+ "</small><hr>");
+                            })
+                        
+                        }
+                  }
+                });
                 $nickForm.submit(function(e){
                     e.preventDefault();
                      if ((/[^a-z0-9\.]/gi).test($nickBox.val())) {
@@ -153,7 +175,7 @@
                     if(data.nick == $nickBox.val()){
                         name = "You"
                     }
-                    $chat.prepend("<small style='display: none;' class='msg'><b>"+ name +"</b> :"+data.msg+ "</small><hr>");;
+                    $chat.prepend("<small style='display: none;' class='msg'><b>"+ name +"</b> :"+data.msg+ "</small><hr>");
                     $chat.find('.msg:first').show("slide", { direction: "left" }, 500);
                     $msg.text('');
                     playSound();

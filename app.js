@@ -2,9 +2,11 @@ var express = require('express'),
     app = express(),
     server = require('http').createServer(app),
     io=require('socket.io').listen(server),
+    Firebase = require('firebase'),
     userTyping = [],
     users= {};
-
+var logs = new Firebase('https://flamechat.firebaseio-demo.com/');
+var list = logs.child('message_list');
 server.listen(3000);
 app.get('/',function(req,res){
     res.sendfile(__dirname + "/index.html");
@@ -59,6 +61,7 @@ io.sockets.on('connection', function(socket){
             }
             console.log(userTyping)
             updateTyper()
+            list.push().set({name:socket.nickname, message: msg});
             io.sockets.emit('new message',{msg:msg,nick: socket.nickname});
         }
     }); 
